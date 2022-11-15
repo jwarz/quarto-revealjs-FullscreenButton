@@ -5,7 +5,7 @@ format:
     chalkboard: true
     
 revealjs-plugins:
-  - fullscreen
+  - FullscreenButton
 ---
 
 # In the morning

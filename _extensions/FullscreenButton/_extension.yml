@@ -8,3 +8,5 @@ contributes:
       script:
         - FullscreenButton.js
         - screenfull.min.js
+      stylesheet:
+        - FullscreenButton.css
