@@ -57,38 +57,53 @@ const initFullscreenButton = function(Reveal) {
     });
   }
   
-  // 4. Style Button depeinding on the link-color variable
+  // 4. Style Button depending on the link-color variable
   // Get R, G, B values
-  function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null;
+  const hexToRGB = (hex) => {
+    var res = hex.substr(1).split(/(..)/).filter(c=>c).map(c => parseInt(c, 16))
+    return `rgb(${res})`;
   }
-  var LinkColorRGB = hexToRgb(getComputedStyle(document.documentElement).getPropertyValue('--r-link-color'));
-  // Create css value
-  var LinkColorCSS = "rgb(" + LinkColorRGB.r + "," + LinkColorRGB.g + "," + LinkColorRGB.b + ")"
+
+  function SvgContainer(svgfill, svgclass, svgpath) {
+    
+    // Container
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    obj = {'xmlns': 'http://www.w3.org/2000/svg', 'width':  16,  'height': 16, 'fill': svgfill, 'class': 'bi bi-' + svgclass,'viewBox': '0 0 16 16'}
+    for(prop in obj) {
+        svg.setAttribute(prop, obj[prop])  
+    }
+    
+    // Path
+    path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttributeNS(null, "d", svgpath);
+    
+    svg.appendChild(path);
+    return svg;
+  }
   
-  // Create stylesheet
-  var FullscreenButtonCSS = `
-.reveal .slide-chalkboard-buttons .fa-expand::before {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="` + LinkColorCSS + `" class="bi bi-fullscreen" viewBox="0 0 16 16"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>');
-}
-.reveal .slide-chalkboard-buttons .fa-compress::before {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="` + LinkColorCSS + `" class="bi bi-fullscreen-exit" viewBox="0 0 16 16"><path d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zm10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4z"/></svg>');
-}
-`
-  var button_StyleSheet = document.createElement("style")
-  button_StyleSheet.innerText = FullscreenButtonCSS
+  svg_path_expand = "M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"
+  svg_path_compress = "M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zm10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4z"
+  
+  // Create css value 
+  var LinkColorRGB = hexToRGB(getComputedStyle(document.documentElement).getPropertyValue('--r-link-color'));
+  
+  var svg_expand   = new SvgContainer(LinkColorRGB, 'fullscreen',      svg_path_expand);
+  var svg_compress = new SvgContainer(LinkColorRGB, 'fullscreen-exit', svg_path_compress);
+  
+  var svg_expand_str   = window.btoa((new XMLSerializer()).serializeToString(svg_expand))
+  var svg_compress_str = window.btoa((new XMLSerializer()).serializeToString(svg_compress))
+  
+  // Create stylesheet  
+  var styleElem = document.head.appendChild(document.createElement("style"));
+  styleElem.innerHTML  = '.reveal .slide-chalkboard-buttons .fa-expand::before   {background-image: url(data:image/svg+xml;base64,' + svg_expand_str   + ');}';
+  styleElem.innerHTML += '.reveal .slide-chalkboard-buttons .fa-compress::before {background-image: url(data:image/svg+xml;base64,' + svg_compress_str + ');}';
 
   // 4. Create Tooltip 
   const ToolTip = document.createElement("script");
   ToolTip.innerHTML = "tippy('#fs-tooltip', {content: 'Toggle Fullscreen', offset: [0, 20], delay: 100, duration: 1000, inertia: true, interactiveDebounce: 75, showOnCreate: true,  onShow(instance) {setTimeout(() => {instance.hide();}, 5000);}});"
 
   // 5. Add Stylesheet, Button and tooltip script to DOM
-  document.querySelector('.slide-chalkboard-buttons').append(button_StyleSheet, button, ToolTip);
+  document.querySelector('.slide-chalkboard-buttons').append(styleElem, button, ToolTip);
 
   })
 }
